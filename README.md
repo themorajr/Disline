@@ -39,7 +39,7 @@ Before you begin, ensure you have met the following requirements:
 
 ## Project Structure
 
-```plaintext
+```
 Line-Discord-File-Manager/
 │
 ├── .env                           # Environment variables for LINE and Discord tokens
@@ -68,7 +68,7 @@ Line-Discord-File-Manager/
 ### 1. Clone the Repository
 
 ```
-bashCopy codegit clone https://github.com/your-username/Line-Discord-File-Manager.git
+codegit clone https://github.com/your-username/Line-Discord-File-Manager.git
 cd Line-Discord-File-Manager
 ```
 
@@ -77,10 +77,6 @@ cd Line-Discord-File-Manager
 Use `pip` to install all the required packages from the `requirements.txt` file:
 
 ```
-bash
-
-
-Copy code
 pip install -r requirements.txt
 ```
 
@@ -89,7 +85,7 @@ pip install -r requirements.txt
 Create a `.env` file in the root of your project and add your LINE and Discord credentials:
 
 ```
-plaintextCopy codeLINE_CHANNEL_SECRET=your_line_channel_secret
+codeLINE_CHANNEL_SECRET=your_line_channel_secret
 LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
 DISCORD_TOKEN=your_discord_bot_token
 DISCORD_CHANNEL_ID=your_discord_channel_id
@@ -104,10 +100,6 @@ DISCORD_CHANNEL_ID=your_discord_channel_id
 You need to initialize the SQLite database by running the Flask application once. This will create the required tables:
 
 ```
-bash
-
-
-Copy code
 python server.py
 ```
 
@@ -118,10 +110,6 @@ The database will be created in the `database/` folder.
 Start the Flask server to handle incoming requests from LINE and manage file uploads:
 
 ```
-bash
-
-
-Copy code
 python server.py
 ```
 
@@ -130,10 +118,6 @@ The server will start running on `http://localhost:5000`.
 You can also deploy the application with a production-grade server like `gunicorn`:
 
 ```
-bash
-
-
-Copy code
 gunicorn --bind 0.0.0.0:5000 server:app
 ```
 
@@ -149,7 +133,7 @@ Make sure the `.env` file contains the following variables:
 Example `.env` file:
 
 ```
-plaintextCopy codeLINE_CHANNEL_SECRET=your_line_channel_secret
+codeLINE_CHANNEL_SECRET=your_line_channel_secret
 LINE_CHANNEL_ACCESS_TOKEN=your_line_channel_access_token
 DISCORD_TOKEN=your_discord_bot_token
 DISCORD_CHANNEL_ID=your_discord_channel_id

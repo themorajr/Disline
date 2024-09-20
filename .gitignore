@@ -5,6 +5,7 @@ ENV/
 env/
 __pycache__/
 instance
+downloads/
 # Ignore environment variable files
 .env
 # Ignore SQLite database files

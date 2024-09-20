@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Manager</title>
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+
+<h1>File Manager</h1>
+
+<div class="file-container">
+    <div class="filter">
+        <input type="text" id="filterInput" placeholder="Search by file type or name">
+        <button onclick="filterFiles()">Search</button>
+    </div>
+    
+    <table id="fileTable">
+        <thead>
+            <tr>
+                <th>File Name</th>
+                <th>File Type</th>
+                <th>File Size (KB)</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- File rows will be dynamically inserted here -->
+        </tbody>
+    </table>
+</div>
+
+<script src="js/app.js"></script>
+</body>
+</html>

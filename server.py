@@ -1,4 +1,5 @@
 from flask import Flask, request, abort
+from flask_sqlalchemy import SQLAlchemy
 import os
 import json
 from linebot import LineBotApi, WebhookHandler
@@ -6,6 +7,7 @@ from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, FileMessage
 from file_manager import is_allowed_file, delete_file
 from discord_bot import post_to_discord
+from database.models import db, File
 
 app = Flask(__name__)
 
@@ -13,18 +15,27 @@ app = Flask(__name__)
 LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET')
 LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
 
+# Database configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/db.sqlite3'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize the database with Flask
+db.init_app(app)
+
 # Initialize LINE Bot API and Webhook Handler
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)
 handler = WebhookHandler(LINE_CHANNEL_SECRET)
 
+# Create database tables (only the first time)
+with app.app_context():
+    db.create_all()
+
 # Define the route for LINE webhook
 @app.route("/callback", methods=['POST'])
 def callback():
-    # Get request headers and body
     signature = request.headers['X-Line-Signature']
     body = request.get_data(as_text=True)
 
-    # Handle the webhook payload
     try:
         handler.handle(body, signature)
     except InvalidSignatureError:
@@ -51,13 +62,18 @@ def handle_file_message(event):
     # Check if the file is allowed
     file_type = f"application/{file_extension[1:]}"  # Simple MIME type guess from extension
     if is_allowed_file(file_path, file_type):
-        # If allowed, post to Discord
+        file_size = os.path.getsize(file_path) / 1024  # Get size in KB
+        
+        # Store file metadata in the database
+        new_file = File(name=file_name, file_type=file_type, size=int(file_size))
+        db.session.add(new_file)
+        db.session.commit()
+
+        # Post to Discord
         if post_to_discord(file_path, file_name):
-            # Optionally delete the file after posting
-            delete_file(file_path)
+            delete_file(file_path)  # Optionally delete after posting
     else:
-        # If not allowed, delete the file
-        delete_file(file_path)
+        delete_file(file_path)  # Delete if file is not allowed
 
 if __name__ == "__main__":
     app.run(port=5000)

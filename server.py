@@ -1,7 +1,11 @@
 from flask import Flask, request, abort
 from flask_sqlalchemy import SQLAlchemy
 import os
-import json
+from dotenv import load_dotenv  # Import dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
 from linebot import LineBotApi, WebhookHandler
 from linebot.exceptions import InvalidSignatureError
 from linebot.models import MessageEvent, FileMessage
@@ -11,16 +15,17 @@ from database.models import db, File
 
 app = Flask(__name__)
 
-# Load environment variables for LINE API
-LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET')
-LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
-
-# Database configuration
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database/db.sqlite3'
+# Set up absolute path for SQLite database
+BASE_DIR = os.path.abspath(os.path.dirname(__file__))
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{os.path.join(BASE_DIR, "database", "db.sqlite3")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Initialize the database with Flask
 db.init_app(app)
+
+# Load environment variables for LINE API
+LINE_CHANNEL_SECRET = os.getenv('LINE_CHANNEL_SECRET')
+LINE_CHANNEL_ACCESS_TOKEN = os.getenv('LINE_CHANNEL_ACCESS_TOKEN')
 
 # Initialize LINE Bot API and Webhook Handler
 line_bot_api = LineBotApi(LINE_CHANNEL_ACCESS_TOKEN)

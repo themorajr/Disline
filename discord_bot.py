@@ -1,36 +1,36 @@
 import os
-import requests
+import discord
+from dotenv import load_dotenv
 
-# Load environment variables (Discord bot token and channel ID)
-DISCORD_BOT_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
-DISCORD_CHANNEL_ID = os.getenv('DISCORD_CHANNEL_ID')
-DISCORD_API_URL = f"https://discord.com/api/v9/channels/{DISCORD_CHANNEL_ID}/messages"
+# Load environment variables from .env file
+load_dotenv()
 
-# Function to post a file to a Discord channel
-def post_to_discord(file_path, file_name):
-    url = DISCORD_API_URL
-    headers = {
-        "Authorization": f"Bot {DISCORD_BOT_TOKEN}"
-    }
+DISCORD_TOKEN = os.getenv('DISCORD_BOT_TOKEN')
+DISCORD_CHANNEL_ID = int(os.getenv('DISCORD_CHANNEL_ID'))
 
-    # Prepare file for uploading
-    files = {
-        'file': (file_name, open(file_path, 'rb'))
-    }
+# Enable necessary intents explicitly
+intents = discord.Intents.default()
+intents.message_content = True  # Enable message content intent
 
-    # Send POST request to Discord API
-    response = requests.post(url, headers=headers, files=files)
+client = discord.Client(intents=intents)
 
-    # Handle response
-    if response.status_code == 200:
-        print(f"File '{file_name}' successfully posted to Discord")
-        return True
+@client.event
+async def on_ready():
+    print(f'Logged in as {client.user}')
+
+async def post_to_discord(file_path, file_name):
+    channel = client.get_channel(DISCORD_CHANNEL_ID)
+    if channel:
+        try:
+            with open(file_path, 'rb') as f:
+                await channel.send(file_name, file=discord.File(f, file_name))
+            print(f"Posted {file_name} to Discord.")
+            return True
+        except Exception as e:
+            print(f"Failed to post to Discord: {e}")
+            return False
     else:
-        print(f"Failed to post file to Discord: {response.status_code}")
+        print(f"Channel {DISCORD_CHANNEL_ID} not found.")
         return False
 
-if __name__ == "__main__":
-    # Example usage (replace with actual path and file name)
-    test_file_path = 'downloads/sample_file.bin'
-    test_file_name = 'sample_file.bin'
-    post_to_discord(test_file_path, test_file_name)
+client.run(DISCORD_TOKEN)
